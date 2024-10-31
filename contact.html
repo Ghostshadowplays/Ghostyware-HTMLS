@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Ghosty Ware</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+</head>
+<body class="contact-page">
+    <header> 
+        {% if session.user_id %}
+            <a href="{{ url_for('profile') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% else %}
+            <a href="{{ url_for('home') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% endif %}
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                {% if session.user_id %}
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Get in Touch</h2>
+        <p>If you have any questions or feedback, feel free to reach out!</p>
+        <p>You can contact me directly at: <a href="mailto:ghostshadow9111993@gmail.com">ghostshadow9111993@gmail.com</a></p>
+        <p>Or you can join my Discord: <a href="https://discord.gg/CRZdwfJ">https://discord.gg/CRZdwfJ</a></p>
+        <p>Link to my Github Page: <a href="https://github.com/Ghostshadowplays">https://github.com/Ghostshadowplays</a></p>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Contact Form -->
+        <h3>Contact Form</h3>
+        <form action="{{ url_for('contact') }}" method="post" class="contact-form">
+            {{ form.hidden_tag() }} <!-- CSRF Token -->
+        
+            <label for="name">Name:</label>
+            {{ form.name(class="input-text short-text", required=True) }} <!-- Render name field -->
+            {% for error in form.name.errors %}
+                <span class="error">{{ error }}</span> <!-- Display name errors -->
+            {% endfor %}
+        
+            <label for="email">Email:</label>
+            {{ form.email(class="input-text short-text", required=True) }} <!-- Render email field -->
+            {% for error in form.email.errors %}
+                <span class="error">{{ error }}</span> <!-- Display email errors -->
+            {% endfor %}
+        
+            <label for="message">Message:</label>
+            {{ form.message(class="input-text short-text", required=True) }} <!-- Render message field -->
+            {% for error in form.message.errors %}
+                <span class="error">{{ error }}</span> <!-- Display message errors -->
+            {% endfor %}
+        </form>
+
+            <button type="submit" class="submit-button">Send Message</button> <!-- Added submit-button class -->
+        </form>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+
+    <script>
+        let startX;
+
+        // Swipe functionality for touch devices
+        document.addEventListener('touchstart', function(event) {
+            startX = event.touches[0].clientX; // Store the initial touch position
+        });
+
+        document.addEventListener('touchend', function(event) {
+            const endX = event.changedTouches[0].clientX; // Get the final touch position
+
+            // Check if the swipe is left or right
+            if (startX - endX > 50) {
+                // Swiped left (navigate to Feedback page)
+                window.location.href = '/feedback';
+            } else if (endX - startX > 50) {
+                // Swiped right (navigate to Tutorials page)
+                window.location.href = '/tutorials';
+            }
+        });
+    </script>
+</body>
+</html>

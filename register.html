@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Ghosty Ware</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <!-- Link to Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header> 
+        {% if session.user_id %}
+            <a href="{{ url_for('profile') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% else %}
+            <a href="{{ url_for('home') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% endif %}
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                {% if session.get('user_id') %}
+                    {% if session.get('is_admin') %}
+                        <li><a href="{{ url_for('view_messages') }}">View Messages</a></li>
+                        <li><a href="{{ url_for('logout') }}">is_admin Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="register-header">
+            <!-- Icon with effects applied through .register-icon class -->
+            <i class="fas fa-user-plus register-icon"></i>
+            <!-- Title with .register-title class for animation -->
+            <h2 class="register-title">Register an Account</h2>
+        </div>
+        
+        <form class="login-form" action="{{ url_for('register') }}" method="POST" onsubmit="showSpinner()">
+            {{ form.hidden_tag() }}  <!-- CSRF token added here -->
+            <h2>Register an Account</h2>
+            <div>
+                {{ form.username.label }}
+                {{ form.username(size=32, class="input-text", required=True) }}
+                {% for error in form.username.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
+                {{ form.email.label }}
+                {{ form.email(size=32, class="input-text", required=True) }}
+                {% for error in form.email.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="input-password" size="32" required>
+                <div id="password-strength" class="password-strength"></div>
+                <h4>Password Requirements:</h4>
+                <div class="password-requirements">
+                    <div id="length" class="requirement">At least 8 characters</div>
+                    <div id="uppercase" class="requirement">At least one uppercase letter</div>
+                    <div id="lowercase" class="requirement">At least one lowercase letter</div>
+                    <div id="number" class="requirement">At least one number</div>
+                    <div id="special" class="requirement">At least one special character</div>
+                </div>
+                {% for error in form.password.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
+                <label for="confirm_password">Confirm Password</label>
+                <input type="password" id="confirm_password" name="confirm_password" class="input-password" size="32" required>
+                {% for error in form.confirm_password.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+            <div>
+                <input type="checkbox" id="show-password">
+                <label for="show-password">Show Password</label>
+            </div>
+            <button type="submit" class="submit-button">Register</button>
+        </form>
+
+        <p>Already have an account? <a href="{{ url_for('login') }}">Login here</a>.</p>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const passwordStrengthIndicator = document.getElementById('password-strength');
+        const confirmPasswordInput = document.getElementById('confirm_password');
+        const showPasswordCheckbox = document.getElementById('show-password');
+        const requirements = {
+            length: document.getElementById('length'),
+            uppercase: document.getElementById('uppercase'),
+            lowercase: document.getElementById('lowercase'),
+            number: document.getElementById('number'),
+            special: document.getElementById('special'),
+        };
+
+        function showSpinner() {
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+            // Disable all mouse clicks by adding a class to the body
+            document.body.classList.add('no-click');
+        }
+
+        showPasswordCheckbox.addEventListener('change', function() {
+            const type = this.checked ? 'text' : 'password';
+            passwordInput.type = type; // Show password
+            confirmPasswordInput.type = type; // Show confirm password
+        });
+
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 'weak';
+            let validCount = 0;
+
+            // Check requirements
+            requirements.length.classList.toggle('valid', password.length >= 8);
+            requirements.uppercase.classList.toggle('valid', /[A-Z]/.test(password));
+            requirements.lowercase.classList.toggle('valid', /[a-z]/.test(password));
+            requirements.number.classList.toggle('valid', /\d/.test(password));
+            requirements.special.classList.toggle('valid', /[!@#$%^&*]/.test(password));
+
+            // Count valid requirements
+            validCount += password.length >= 8 ? 1 : 0;
+            validCount += /[A-Z]/.test(password) ? 1 : 0;
+            validCount += /[a-z]/.test(password) ? 1 : 0;
+            validCount += /\d/.test(password) ? 1 : 0;
+            validCount += /[!@#$%^&*]/.test(password) ? 1 : 0;
+
+            // Determine strength
+            if (validCount === 5) {
+                strength = 'strong';
+            } else if (validCount >= 3) {
+                strength = 'medium';
+            }
+
+            passwordStrengthIndicator.textContent = `Password strength: ${strength}`;
+            passwordStrengthIndicator.className = `password-strength ${strength}`;
+        });
+    </script>
+</body>
+</html>

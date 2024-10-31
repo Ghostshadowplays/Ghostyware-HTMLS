@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Change Email - Ghosty Ware</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+
+</head>
+<body>
+    <header> 
+        {% if session.user_id %}
+            <a href="{{ url_for('profile') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% else %}
+            <a href="{{ url_for('home') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% endif %}
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                {% if session.user_id %}
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <ul class="flashes" aria-live="polite">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <h1>Change Email</h1>
+        <form class="change-email-form" method="POST" onsubmit="showSpinner()">
+            {{ form.hidden_tag() }}
+
+            <div>
+                <label for="current_password">Current Password:</label>
+                <input type="password" id="current_password" name="current_password" class="input-text" required>
+                <label for="show-current-password">
+                    <input type="checkbox" id="show-current-password"> Show Password
+                </label>
+            </div>
+            
+            <div>
+                <label for="new_email">New Email:</label>
+                <input type="email" id="new_email" name="new_email" class="input-text" required placeholder="Enter your new email">
+            </div>
+            
+            <div>
+                <label for="confirm_email">Confirm New Email:</label>
+                <input type="email" id="confirm_email" name="confirm_email" class="input-text" required placeholder="Confirm your new email">
+            </div>
+
+            <button type="submit" class="submit-button">Change Email</button>
+        </form>
+    </div>
+
+    <!-- Spinner -->
+    <div id="loading-spinner">
+        <img src="{{ url_for('static', filename='spinner.gif') }}" alt="Loading...">
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+
+    <script>
+        function showSpinner() {
+            document.getElementById('loading-spinner').style.display = 'block'; // Show spinner
+            document.querySelector('.submit-button').disabled = true; // Disable button
+        }
+
+        const currentPasswordInput = document.getElementById('current_password');
+        const showCurrentPasswordCheckbox = document.getElementById('show-current-password');
+
+        showCurrentPasswordCheckbox.addEventListener('change', function() {
+            currentPasswordInput.type = this.checked ? 'text' : 'password'; // Toggle password visibility
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Response</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+</head>
+<body>
+    <main>
+        <form id="login-form">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <label>
+                <input type="checkbox" id="remember"> Remember Me
+            </label>
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="api-response" aria-live="polite">
+            <img src="/static/background3.png" alt="API Icon" class="response-icon" /> <!-- Ensure correct image extension -->
+            <h1>API Response Title</h1>
+            <p>Your data goes here...</p>
+        </div>
+
+        <div id="loading-spinner" class="hidden" aria-live="assertive"> <!-- Use a class to control visibility -->
+            <img src="/static/spinner.gif" alt="Loading..." />
+        </div>
+
+        <p class="error-message" id="error-message" style="display: none;"></p> <!-- Error message container -->
+    </main>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form submission
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.querySelector('.api-response h1').innerText = ''; // Clear previous response
+            document.querySelector('.api-response p').innerText = ''; // Clear previous message
+            document.getElementById('error-message').style.display = 'none'; // Hide error message
+
+            // Fetch API response
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    remember: remember
+                })
+            })
+            .then(response => {
+                document.getElementById('loading-spinner').style.display = 'none';
+                
+                if (response.status === 429) {
+                    // Handle rate limit exceeded
+                    document.getElementById('error-message').innerText = 'Rate limit exceeded, please try again later.';
+                    document.getElementById('error-message').style.display = 'block';
+                    return;
+                }
+
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    document.querySelector('.api-response h1').innerText = data.message;
+
+                    // Redirect if needed
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    }
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading-spinner').style.display = 'none';
+                console.error('Error:', error);
+                document.getElementById('error-message').innerText = 'An error occurred. Please try again later.'; // Show error message
+                document.getElementById('error-message').style.display = 'block'; // Display error message
+            });
+        });
+    </script>
+</body>
+</html>

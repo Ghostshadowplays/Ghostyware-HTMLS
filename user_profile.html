@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.username }}'s Profile - Ghosty Ware</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('home') }}"><img src="{{ url_for('static', filename='logo.png') }}" alt="Ghosty Ware Logo" class="logo" >
+        </a>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('projects') }}">Projects</a></li>
+                <li><a href="{{ url_for('tutorials') }}">Tutorials</a></li>
+                <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                {% if session.user_id %}
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <!-- Flash Message Section -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <h1 class="profile-name">{{ user.username }}</h1>
+
+        <div class="profile-section">
+            <div class="profile-photo-container">
+                {% if user.profile_photo %}
+                    <img src="{{ url_for('static', filename='profile_photos/' + user.profile_photo) }}" alt="Profile Photo" class="profile-photo">
+                {% else %}
+                    <p>No profile photo uploaded.</p>
+                {% endif %}
+            </div>
+
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Account Created:</strong> {{ user.created_at.strftime('%B %d, %Y') }}</p>
+
+            <div class="bio-display-section">
+                <h3>User Bio:</h3>
+                <p>{{ user.bio if user.bio else 'No bio available.' }}</p>
+            </div>
+
+            {% if user.comments %}
+                <div class="comments-section">
+                    <h3>Comments</h3>
+                    <ul>
+                        {% for comment in user.comments %}
+                            <li>
+                                <p>{{ comment.content }}</p>
+                                <p><em>{{ comment.date_posted.strftime('%B %d, %Y') }}</em></p>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <!-- Form for sending friend requests -->
+            <div class="friend-request-form">
+                {% if not is_friend %}
+                    <h3>Send Friend Request</h3>
+                    <form id="friendRequestForm" action="{{ url_for('send_friend_request', receiver_id=user.id) }}" method="post">
+                        {{ form.hidden_tag() }}  <!-- Include CSRF token here -->
+                        <input type="hidden" name="receiver_id" value="{{ user.id }}">
+                        <button type="submit" class="button">Send Friend Request</button>
+                    </form>
+                {% else %}
+                    <h3>You are friends with {{ user.username }}!</h3>
+                    <form id="removeFriendForm" action="{{ url_for('remove_friend', friend_id=user.id) }}" method="post">
+                        {{ form.hidden_tag() }}  <!-- Include CSRF token here -->
+                        <input type="hidden" name="friend_id" value="{{ user.id }}">
+                        <button type="submit" class="button">Remove Friend</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+
+    <script>
+        $(document).ready(function() {
+            $('#friendRequestForm').on('submit', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        if (response.success) {
+                            // Clear any previous messages
+                            $('.flashes').remove(); // Optionally remove old messages
+
+                            // Show success message
+                            $('main.container').prepend('<ul class="flashes"><li class="success">' + response.message + '</li></ul>');
+                        }
+                    },
+                    error: function() {
+                        // Handle error if necessary
+                        $('main.container').prepend('<ul class="flashes"><li class="error">An error occurred while sending the friend request.</li></ul>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

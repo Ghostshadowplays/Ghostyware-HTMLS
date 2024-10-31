@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Ghosty Ware</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+</head>
+<body>
+    <header> 
+        {% if session.user_id %}
+            <a href="{{ url_for('profile') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% else %}
+            <a href="{{ url_for('home') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% endif %}
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                {% if session.user_id %}
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="intro">
+            <h2>Welcome to Ghosty Ware</h2>
+            <p>Your hub for advanced tools designed for system management, security, and productivity.</p>
+        </section>
+
+        <section class="project-gallery">
+            <h2>Newest Projects</h2>
+            <div class="project-container">
+                <div class="project">
+                    <img src="/static/images/ghosty_tool.png" alt="Ghosty Tool" class="project-image">
+                    <h3>Ghosty Tool</h3>
+                    <p>Ghosty Tool is an all-in-one solution for system management, offering features like maintenance functions, speed tests, and mini-games.</p>
+                    <a class="button" href="/downloads/Ghosty Tools.zip">Download Ghosty Tools</a>
+                </div>
+
+                <div class="project">
+                    <img src="/static/images/ShadowKeys GUI.png" alt="Shadow Keys" class="project-image">
+                    <h3>Shadow Keys</h3>
+                    <p>ShadowKeys is a secure password manager that encrypts your credentials, making it easy to store and access your passwords safely.</p>
+                    <a class="button" href="/downloads/ShadowKeys.zip">Download ShadowKeys</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features">
+            <h2>Key Features</h2>
+            <div class="feature-list">
+                <div class="feature">
+                    <h3>Ghosty Tool</h3>
+                    <ul>
+                        <li>System Cleanup and Optimization</li>
+                        <li>Network Speed Tests</li>
+                        <li>Customizable Dark Mode</li>
+                        <li>Integrated Mini-Games</li>
+                    </ul>
+                </div>
+                <div class="feature">
+                    <h3>ShadowKeys</h3>
+                    <ul>
+                        <li>Secure Password Storage</li>
+                        <li>Password Generator</li>
+                        <li>Two-Factor Authentication</li>
+                        <li>Cross-Platform Compatibility</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware<br>Open Source | <a href="https://github.com/Ghostshadowplays" target="_blank">GitHub</a></p>
+    </footer>
+
+    <script>
+        let startX;
+
+        document.addEventListener('touchstart', function(event) {
+            startX = event.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', function(event) {
+            const endX = event.changedTouches[0].clientX;
+            if (startX - endX > 50) {
+                window.location.href = '/projects';
+            } else if (endX - startX > 50) {
+                window.location.href = '/contact';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects - Ghosty Ware</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+</head>
+<body>
+    <header> 
+        {% if session.user_id %}
+            <a href="{{ url_for('profile') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% else %}
+            <a href="{{ url_for('home') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% endif %}
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                {% if session.user_id %}
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li> <!-- Show login if not logged in -->
+                    <li><a href="{{ url_for('register') }}">Register</a></li> <!-- Show register if not logged in -->
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+<main>
+    <h2>Available Projects</h2>
+    <div class="project-gallery">
+        <ul>
+            <li>
+                <div class="project-button">
+                    <a class="button" href="/downloads/Ghosty Tools.zip">Download Ghosty Tool</a>
+                </div>
+            </li>
+            <li>
+                <div class="project-button">
+                    <a class="button" href="/downloads/ShadowKeys.zip">Download Shadow Keys</a>
+                </div>
+            </li>
+            <li>
+                <div class="project-button">
+                    <a class="button" href="/downloads/GhostTune Converter.zip">Download GhostTune Converter</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</main>
+
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+
+    <script>
+        let startX;
+
+        // Swipe functionality for touch devices
+        document.addEventListener('touchstart', function(event) {
+            startX = event.touches[0].clientX; // Store the initial touch position
+        });
+
+        document.addEventListener('touchend', function(event) {
+            const endX = event.changedTouches[0].clientX; // Get the final touch position
+
+            // Check if the swipe is left or right
+            if (startX - endX > 50) {
+                // Swiped left (navigate to Tutorials page)
+                window.location.href = '/tutorials';
+            } else if (endX - startX > 50) {
+                // Swiped right (navigate to Home page)
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>

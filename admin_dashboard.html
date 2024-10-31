@@ -1,0 +1,41 @@
+<!-- is_admin_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>is_admin Dashboard - Ghosty Ware</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/logout">Logout</a></li> <!-- Logout link -->
+            </ul>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h1>Welcome to the is_admin Dashboard</h1>
+        <!-- is_admin functionalities -->
+        <section>
+            <h2>User Management</h2>
+            <p><a href="/is_admin/users">View and manage users</a></p>
+            <p><a href="/is_admin/settings">Site settings</a></p>
+            <p><a href="/is_admin/reports">View reports</a></p>
+            <!-- Add more is_admin functionalities here -->
+        </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+</body>
+</html>

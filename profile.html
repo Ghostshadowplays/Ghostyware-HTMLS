@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="User profile page for Ghosty Ware, allowing users to view and update their profile information.">
+    <title>Your Profile - Ghosty Ware</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <header>
+        <a href="{{ url_for('home') }}">
+            <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+        </a>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('projects') }}">Projects</a></li>
+                <li><a href="{{ url_for('tutorials') }}">Tutorials</a></li>
+                <li><a href="{{ url_for('feedback') }}">Feedback</a></li>
+                <li><a href="{{ url_for('contact') }}">Contact</a></li>
+                {% if session['user_id'] %}
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main class="profile-container">
+        <!-- Main Profile Content -->
+        <section class="profile-content">
+            <h1></h1>
+            <h2>Welcome, {{ user.username }}!</h2>
+            <div class="profile-photo-container">
+                {% if user.profile_photo %}
+                    <img src="{{ url_for('static', filename='profile_photos/' + user.profile_photo) }}" alt="Profile Photo" class="profile-photo">
+                {% else %}
+                    <img src="{{ url_for('static', filename='profile_photos/default-photo.jpg') }}" alt="Default Profile Photo" class="profile-photo">
+                {% endif %}
+            </div>
+            
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Account Created:</strong> {{ user.created_at.strftime('%B %d, %Y') }}</p>
+    
+            <div class="bio-display-section">
+                <h3>Your Bio:</h3>
+                <p>{{ user.bio if user.bio else 'No bio available.' }}</p>
+            </div>
+    
+            <div class="update-section">
+                <h3>Update Your Profile</h3>
+                <form method="POST" action="{{ url_for('update_profile') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <label for="bio">Edit Bio:</label>
+                    {{ form.bio(class="form-control", rows="6", placeholder="Write your bio here...") }}
+                    <label for="profile_photo" class="file-input-label">Profile Photo:</label>
+                    {{ form.profile_photo(class="file-input", onchange="this.nextElementSibling.innerHTML = this.value.split('\\').pop();") }}
+                    <button type="submit" class="button">Update Profile</button>
+                </form>
+            </div>
+    
+            <div class="actions-section">
+                <h3>Account Actions</h3>
+                <ul>
+                    <li><a class="button" href="{{ url_for('change_password') }}">Reset Password</a></li>
+                    <li><a class="button" href="{{ url_for('change_email') }}">Change Email</a></li>
+                    <li><a class="button" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </div>
+    
+            <div class="friend-requests-section">
+                <h3>Friend Requests</h3>
+                <ul>
+                    {% if friend_requests %}
+                        {% for request in friend_requests %}
+                            <li>
+                                {{ request.sender.username }}
+                                <form action="{{ url_for('accept_friend_request', request_id=request.id) }}" method="POST" style="display:inline;">
+                                    {{ form.hidden_tag() }}
+                                    <button type="submit" class="button">Accept</button>
+                                </form>
+                            </li>
+                        {% endfor %}
+                    {% else %}
+                        <li>No friend requests.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </section>
+    
+        <!-- Friends List Sidebar -->
+        <!-- Friends List Sidebar -->
+        <aside class="friends-list-section profile-sidebar">
+            <h3>Friends</h3>
+            <ul>
+                {% if friends %}
+                    {% for friend in friends %}
+                        <li>
+                            <a href="{{ url_for('view_user_profile', user_id=friend.id) }}">
+                                <img src="{{ url_for('static', filename='profile_photos/' + (friend.profile_photo or 'default-photo.jpg')) }}" alt="Profile Photo" class="friend-photo">
+                            </a>
+                            <strong>
+                                <a href="{{ url_for('view_user_profile', user_id=friend.id) }}">{{ friend.username }}</a>
+                            </strong>
+                            <span class="friend-status {{ 'online' if friend.is_online else 'offline' }}">
+                                {{ 'Online' if friend.is_online else 'Offline' }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <li>You haven't added any friends yet.</li>
+                {% endif %}
+            </ul>
+        </aside>
+
+    </main>
+    
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+</body>
+</html>

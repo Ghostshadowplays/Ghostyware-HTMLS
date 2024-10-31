@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Ghosty Ware</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header> 
+        {% if session.user_id %}
+            <a href="{{ url_for('profile') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% else %}
+            <a href="{{ url_for('home') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% endif %}
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                {% if session.get('user_id') %}
+                    {% if session.get('is_admin') %}
+                        <li><a href="{{ url_for('view_messages') }}">View Messages</a></li>
+                        <li><a href="{{ url_for('logout') }}">is_admin Logout</a></li>
+                    {% else %}
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                    {% endif %}
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="loading-spinner" style="display: none;">
+            <img src="{{ url_for('static', filename='spinner.gif') }}" alt="Loading..." />
+        </div>
+
+        <div class="login-header">
+            <i id="lock-icon" class="icon">🔒</i>
+            <h1 class="login-title">Login To Ghosty Ware</h1>
+        </div>
+
+        <!-- Hidden compliment box -->
+        <div id="compliment-box" class="compliment-box">
+            <p id="compliment-text"></p>
+        </div>
+
+        <form class="login-form" id="login-form" method="POST">
+            {{ form.csrf_token }}
+            <div>
+                {{ form.username.label }}
+                {{ form.username(size=32, class="input-text", required=True) }}
+                {% for error in form.username.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="input-password" size="32" required>
+                <div>
+                    <input type="checkbox" id="show-password">
+                    <label for="show-password">Show Password</label>
+                </div>
+                {% for error in form.password.errors %}
+                    <span class="error">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.remember() }}
+                {{ form.remember.label }}
+            </div>
+
+            <button type="submit" class="submit-button">Login</button>
+        </form>
+
+        <p>Don't have an account? <a href="{{ url_for('register') }}">Register here</a>.</p>
+        <p><a href="{{ url_for('forgot_password') }}">Forgot Password?</a></p>
+    </main>
+    
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+
+    <script>
+        const compliments = [
+            "You're looking great today!",
+            "You have a fantastic smile!",
+            "You're a wonderful person!",
+            "Your kindness is contagious!",
+            "You're stronger than you know!",
+            "You light up the room!",
+            "You make a difference!",
+            "You're full of potential!",
+            "Talking to you is like a breath of fresh air.",
+            "You're the bravest person I know! I wish I was more like you.",
+            "You're better than a triple-scoop ice cream cone…with sprinkles.",
+            "You're the sweetest—you don't have a mean bone in your body, do you?",
+            "You're a natural at whatever you do!",
+            "Great job today. I love working with you!",
+            "Your energy is infectious!",
+            "You're so kind that you make everyone around you a better person.",
+            "I love how you can turn even the simplest situation into something fun.",
+            "I wish I were half of the human you are.",
+            "Your creativity is on another level!",
+            "I love how you decorated your house. It looks like it belongs on HGTV.",
+            "When you get famous, I want to be the president of your fan club.",
+            "You set such a good example for your kids.",
+            "You're irreplaceable.",
+            "It's too bad every boss can't be like you.",
+            "I love your confidence. Can you send some of it my way?",
+            "You're so kind. Everyone instantly feels like your friend.",
+            "I wish I could figure things out as quickly as you do.",
+            "I'm proud of how far you have come and for never giving up.",
+            "Everyone needs a friend like you in their life.",
+            "I feel special calling someone like you my friend.",
+            "You never disappoint me. I love that I can count on you no matter what.",
+            "You have such great style! I wish I had your closet.",
+            "You are more amazing than you realize.",
+            "I love that you can always find that silver lining in bad situations.",
+            "Talking to you always puts me in a good mood.",
+            "You're so inspiring, even if you don't realize it.",
+            "You're truly a gem—there's nobody like you.",
+            "You look flawless without makeup on.", // <-- Added comma here
+            "Not everyone can pull off that look, but you sure can!",
+            "You radiate from head to toe.",
+            "Your ideas will change the world one day.",
+            "You're the most thoughtful person I've ever met.",
+            "Everyone should be able to come to you for advice.",
+            "You're so inspiring. I look up to you.",
+            "Your artwork belongs in a museum!",
+            "You're my hero.",
+            "If only everyone was as sweet as you.",
+            "Your Instagram is goals!",
+            "You make the world more interesting.",
+            "I've never met anyone as caring as you.",
+            "Please never stop being you!",
+            "Your hugs make all my troubles melt away.",
+            "Everyone deserves a mom/dad like you!",
+            "Your heart must be ten times the average size.",
+            "You never fail to impress me.",
+            "You're such a ray of sunshine.",
+            "Is there anything you can't do?",
+            "Anyone would be lucky to have you work for them!",
+            "You deserve an award for everything you do.",
+            "How do you make sweatpants look so good?",
+            "You're the fiercest person I know.",
+            "When I grow up, I want to be just like you.",
+            "The best perk of this job is working with you.",
+            "Your hard work is going to take you far.",
+            "You always bring out the best in people. It's no wonder you're good at your job.",
+            "Your passion motivates me.",
+            "Being around you is like a happy little vacation.",
+            "I always enjoy talking to you because you are such a great listener.",
+            "Wow, you're talented beyond your years!",
+            "You have a fantastic sense of humor, and your positivity is infectious!",
+            "You always make people feel valued and appreciated.",
+            "Your kindness always brightens up the room!",
+            "You always know how to make others smile.",
+            "Your generosity is truly inspiring.",
+            "You always find the good in every situation.",
+            "Your perspective is always so refreshing!",
+            "You always handle challenges with such grace!",
+            "You make a difference in so many lives."
+        ];
+
+        function showCompliment() {
+            const randomCompliment = compliments[Math.floor(Math.random() * compliments.length)];
+            document.getElementById("compliment-text").textContent = randomCompliment;
+
+            const complimentBox = document.getElementById("compliment-box");
+            complimentBox.style.display = "block";
+            setTimeout(() => {
+                complimentBox.style.display = "none";
+            }, 3000);
+        }
+
+        document.getElementById("lock-icon").addEventListener("click", showCompliment);
+
+        const passwordInput = document.getElementById('password');
+        const showPasswordCheckbox = document.getElementById('show-password');
+
+        showPasswordCheckbox.addEventListener('change', function() {
+            passwordInput.type = this.checked ? 'text' : 'password';
+        });
+
+        document.getElementById("login-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            document.getElementById('loading-spinner').style.display = 'block';
+
+            fetch("/api/login", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading-spinner').style.display = 'none';
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading-spinner').style.display = 'none';
+                console.error("Error:", error);
+            });
+        });
+
+        document.getElementById("resend-confirmation-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            document.getElementById('loading-spinner').style.display = 'block';
+            
+            fetch("{{ url_for('resend_confirmation') }}", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading-spinner').style.display = 'none';
+                const messageContainer = document.getElementById('resend-message');
+                messageContainer.style.display = 'block';
+                messageContainer.innerText = data.message;
+            })
+            .catch(error => {
+                document.getElementById('loading-spinner').style.display = 'none';
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>

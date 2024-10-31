@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <a href="/"><img src="/static/logo.png" alt="Ghosty Ware Logo" style="height: 60px;"></a>
+    <title>View Messages - Ghosty Ware</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>Contact Messages</h1>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                {% if session.get('is_admin') %}
+                    <li><a href="{{ url_for('is_admin_logout') }}">is_admin Logout</a></li>
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('is_admin_login') }}">is_admin Login</a></li>
+                {% endif %}
+                <li><a href="/view_messages">View Messages</a></li>
+                <li><a href="/contact">Contact</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Messages</h2>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                    {% for message in messages %}
+                        <li class="flash">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        <ul>
+            {% for message in messages %}
+                <li>
+                    <strong>{{ message.name }} ({{ message.email }})</strong>: {{ message.message }} <br>
+                    <em>Submitted on: {{ message.date_submitted.strftime('%Y-%m-%d %H:%M:%S') }}</em>
+                </li>
+            {% else %}
+                <li>No messages found.</li>
+            {% endfor %}
+        </ul>
+    </main>
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+</body>
+</html>

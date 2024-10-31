@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - Ghosty Ware</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+</head>
+<body class="feedback-page">
+    <header> 
+        {% if session.user_id %}
+            <a href="{{ url_for('profile') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% else %}
+            <a href="{{ url_for('home') }}">
+                <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+            </a>
+        {% endif %}
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                {% if 'user_id' in session %}
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <!-- Feedback Form -->
+        <h1>We Value Your Feedback!</h1>
+        <form action="{{ url_for('submit_feedback') }}" method="post" class="feedback-form">
+            {{ form.hidden_tag() }} <!-- Optional CSRF protection -->
+            <label for="message">{{ form.message.label }}</label>
+            <textarea id="message" name="message" rows="8" cols="50" class="form-control" placeholder="Share your thoughts here..." required></textarea>
+            <button type="submit" class="submit-button">Submit</button>
+            {% if request.args.get('feedback_submitted') %}
+                <p class="confirmation-message">Thank you for your feedback!</p>
+            {% endif %}
+        </form>
+
+        <h2>User Feedback</h2>
+        <ul class="feedback-list">
+            {% for entry in feedback %}
+                <li class="feedback-entry">
+                    <p>
+                        {% if entry.user_id %}
+                            <a href="{{ url_for('view_user_profile', user_id=entry.user_id) }}">
+                                <img src="{{ entry.user.profile_photo }}" alt="{{ entry.user.username }}'s profile photo" class="profile-photo" onerror="this.style.display='none'">
+                                <strong>{{ entry.user.username }}</strong>  <!-- Changed from entry.user.name to entry.user.username -->
+                            </a>:
+                        {% else %}
+                            <strong>Anonymous</strong>:
+                        {% endif %}
+                        {{ entry.message }}
+                    </p>
+                    <p class="feedback-date"><em>{{ entry.date_submitted.strftime('%Y-%m-%d') }}</em></p>
+                </li>
+            {% else %}
+                <li>No feedback yet. Be the first to submit!</li>
+            {% endfor %}
+        </ul>
+        
+        
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+
+    <!-- Swipe Navigation Script for Mobile Devices -->
+    <script>
+        let startX;
+
+        document.addEventListener('touchstart', function(event) {
+            startX = event.touches[0].clientX;
+        });
+
+        document.addEventListener('touchend', function(event) {
+            const endX = event.changedTouches[0].clientX;
+            const swipeThreshold = 50; // Minimum distance for swipe detection
+
+            if (startX - endX > swipeThreshold) {
+                // Swiped left (navigate to Contact page)
+                window.location.href = '/contact';
+            } else if (endX - startX > swipeThreshold) {
+                // Swiped right (navigate to Tutorials page)
+                window.location.href = '/tutorials';
+            }
+        });
+    </script>
+</body>
+</html>

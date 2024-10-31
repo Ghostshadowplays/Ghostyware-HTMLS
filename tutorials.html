@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorials - Ghosty Ware</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+</head>
+<body class="tutorials-page">
+    <header>
+        <a href="{{ url_for('home') }}">
+            <img src="/static/logo.png" alt="Ghosty Ware Logo" class="logo">
+        </a>
+        <nav>
+            <ul class="nav-list">
+                <li><a href="/">Home</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/tutorials">Tutorials</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/contact">Contact</a></li>
+                {% if session.user_id %}
+                    <li><a href="{{ url_for('profile') }}">Profile</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Explore Our Tutorials</h2>
+        <p>Here you can find various tutorials on how to use Ghosty Tool and more!</p>
+
+        <div class="tutorials-list">
+            <ul>
+                <li>
+                    <a class="button" id="tutorial1-button" href="#">Tutorial 1: Getting Started with Ghosty Tool</a>
+                    <div id="tutorial1-video" style="display: none;">
+                        <iframe width="800" height="450" src="https://www.youtube.com/embed/RzxSo2cDl00" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </li>
+                <li>
+                    <a class="button" id="tutorial2-button" href="#">Tutorial 2: Troubleshooting with Ghosty Tool</a>
+                    <div id="tutorial2-video" style="display: none;">
+                        <iframe width="800" height="450" src="https://www.youtube.com/embed/ZZoZcMm8qlU" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </li>
+                <li>
+                    <a class="button" id="tutorial3-button" href="#">Tutorial 3: How to Use ShadowKeys/Password generator</a>
+                    <div id="tutorial3-video" style="display: none;">
+                        <iframe width="800" height="450" src="https://www.youtube.com/embed/Xy5fpoeFYxQ" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Ghosty Ware</p>
+    </footer>
+
+    <script>
+        // Function to toggle video visibility
+        function toggleVideo(buttonId, videoId) {
+            var videoContainer = document.getElementById(videoId);
+            var buttons = document.querySelectorAll('.tutorials-list .button');
+
+            // Hide all videos first
+            document.querySelectorAll('.tutorials-list > li > div').forEach(function(video) {
+                video.style.display = 'none';
+            });
+
+            // Remove the 'active' class from all buttons
+            buttons.forEach(function(button) {
+                button.classList.remove('active');
+            });
+
+            // Toggle the clicked video
+            if (videoContainer.style.display === "block") {
+                videoContainer.style.display = "none"; // Hide if it's already displayed
+            } else {
+                videoContainer.style.display = "block"; // Show the selected video
+                // Add active class to the clicked button for styling if needed
+                document.getElementById(buttonId).classList.add('active');
+            }
+        }
+
+        document.getElementById('tutorial1-button').onclick = function(event) {
+            event.preventDefault(); // Prevent the default anchor behavior
+            toggleVideo('tutorial1-button', 'tutorial1-video');
+        }
+
+        document.getElementById('tutorial2-button').onclick = function(event) {
+            event.preventDefault(); // Prevent the default anchor behavior
+            toggleVideo('tutorial2-button', 'tutorial2-video');
+        }
+        
+        document.getElementById('tutorial3-button').onclick = function(event) {
+            event.preventDefault(); // Prevent the default anchor behavior
+            toggleVideo('tutorial3-button', 'tutorial3-video');
+        }
+
+        let startX;
+
+        // Swipe functionality for touch devices
+        document.addEventListener('touchstart', function(event) {
+            startX = event.touches[0].clientX; // Store the initial touch position
+        });
+
+        document.addEventListener('touchend', function(event) {
+            const endX = event.changedTouches[0].clientX; // Get the final touch position
+
+            // Check if the swipe is left or right
+            if (startX - endX > 50) {
+                // Swiped left (navigate to Feedback page)
+                window.location.href = '/feedback';
+            } else if (endX - startX > 50) {
+                // Swiped right (navigate to Projects page)
+                window.location.href = '/projects';
+            }
+        });
+    </script>
+</body>
+</html>
